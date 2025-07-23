@@ -1,23 +1,16 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/Namang1/python-jenkins-pipeline.git'
-            }
-        }
+    environment {
+        POETRY_HOME = "/var/lib/jenkins/.local/bin"
+        PATH = "${POETRY_HOME}:${PATH}"
+    }
 
+    stages {
         stage('Check Poetry') {
             steps {
-                sh '''
-                if ! command -v poetry &> /dev/null
-                then
-                    echo "Poetry not found!"
-                    exit 1
-                fi
-                poetry --version
-                '''
+                sh 'which poetry'
+                sh 'poetry --version'
             }
         }
 
@@ -27,13 +20,7 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                sh 'echo "No tests defined."'
-            }
-        }
-
-        stage('Restart FastAPI Service') {
+        stage('Restart Service') {
             steps {
                 sh 'sudo systemctl restart fastapi-jenkins.service'
             }
