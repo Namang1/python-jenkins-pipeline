@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "jenkins-fastapi-app"
+version = "0.1.0"
+description = "FastAPI app deployed via Jenkins"
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.110"
+uvicorn = "^0.29.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
