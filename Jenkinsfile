@@ -2,39 +2,33 @@ pipeline {
     agent any
 
     environment {
-        PATH = "${env.HOME}/.local/bin:${env.PATH}"  
+        PATH = "/var/lib/jenkins/.local/bin:$PATH"  // add Poetry's path to environment
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Check Poetry') {
             steps {
-                echo 'Cloning repository...'
-                checkout scm
+                sh '''
+                    if ! command -v poetry &> /dev/null; then
+                      echo "❌ Poetry not found! Exiting."
+                      exit 1
+                    fi
+                    echo "✅ Poetry found:"
+                    poetry --version
+                '''
             }
         }
 
-        stage('Verify Poetry Installation') {
-            steps {
-                sh 'poetry --version'
-            }
-        }
-
-        stage('Install Dependencies') {
+        stage('Install dependencies') {
             steps {
                 sh 'poetry install'
             }
         }
 
-        stage('Run App with Uvicorn') {
+        stage('Run Server') {
             steps {
-                sh 'poetry run uvicorn main:app --host 0.0.0.0 --port 8010 --workers 2 &'
+                sh 'poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 &'
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline execution complete.'
         }
     }
 }
