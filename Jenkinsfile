@@ -1,33 +1,41 @@
 pipeline {
     agent any
 
-    environment {
-        PATH = "/var/lib/jenkins/.local/bin:$PATH"  // add Poetry's path to environment
-    }
-
     stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/Namang1/python-jenkins-pipeline.git'
+            }
+        }
+
         stage('Check Poetry') {
             steps {
                 sh '''
-                    if ! command -v poetry &> /dev/null; then
-                      echo "❌ Poetry not found! Exiting."
-                      exit 1
-                    fi
-                    echo "✅ Poetry found:"
-                    poetry --version
+                if ! command -v poetry &> /dev/null
+                then
+                    echo "Poetry not found!"
+                    exit 1
+                fi
+                poetry --version
                 '''
             }
         }
 
-        stage('Install dependencies') {
+        stage('Install Dependencies') {
             steps {
                 sh 'poetry install'
             }
         }
 
-        stage('Run Server') {
+        stage('Run Tests') {
             steps {
-                sh 'poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 &'
+                sh 'echo "No tests defined."'
+            }
+        }
+
+        stage('Restart FastAPI Service') {
+            steps {
+                sh 'sudo systemctl restart fastapi-jenkins.service'
             }
         }
     }
@@ -35,9 +43,10 @@ pipeline {
 
 
 
-## sudo nano /etc/systemd/system/fastapi-jenkins.service
-## write the systemd file here with all the necessary things
-#commands to activate the service
+
+// ## sudo nano /etc/systemd/system/fastapi-jenkins.service
+// ## write the systemd file here with all the necessary things
+// #commands to activate the service
 // sudo systemctl daemon-reexec
 // sudo systemctl daemon-reload
 // sudo systemctl enable fastapi-jenkins.service
