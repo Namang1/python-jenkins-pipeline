@@ -1,0 +1,15 @@
+  GNU nano 4.8                                             /etc/systemd/system/fastapi-jenkins.service                                                       
+[Unit]
+Description=FastAPI App run by Jenkins using Poetry
+After=network.target
+
+[Service]
+User=jenkins
+Group=jenkins
+WorkingDirectory=/var/lib/jenkins/workspace/jenkins_test_pipeline
+ExecStart=/var/lib/jenkins/.local/bin/poetry run uvicorn main:app --host 0.0.0.0 --port 8000
+Restart=always
+Environment="PATH=/var/lib/jenkins/.local/bin:/usr/bin:/bin"
+
+[Install]
+WantedBy=multi-user.target
